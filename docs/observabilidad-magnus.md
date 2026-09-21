@@ -1,5 +1,13 @@
 # Observabilidad de Magnus y troncales
 
+## Repositorios relacionados
+
+El despliegue base de HOMER 7 se conserva en el repositorio:
+
+- [acevallos31/homer7-docker](https://github.com/acevallos31/homer7-docker)
+
+Ese repositorio contiene recetas Docker/Compose de HOMER. Este documento describe la operación actual sobre el stack desplegado en Docker02 y la integración con Magnus/Asterisk. No se deben confundir las recetas originales con la configuración operativa actual.
+
 ## Objetivo
 
 Documentar la arquitectura utilizada para:
@@ -53,7 +61,7 @@ La comunicación hacia Docker02 fue validada desde Magnus:
 curl -i http://100.100.2.64:3100/ready
 ```
 
-Resultado esperado:
+Resultado observado:
 
 ```text
 HTTP/1.1 200 OK

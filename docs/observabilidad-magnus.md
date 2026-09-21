@@ -26,7 +26,7 @@ Magnus/Asterisk (srv-pbx-cystech)
   │    └─ HEP/UDP hacia 100.100.2.64:9060
   │         └─ HOMER en docker02
   └─ Logs y estado de troncales
-       └─ Alloy (pendiente de configuración)
+       └─ Alloy (systemd)
             └─ HTTP hacia Loki en 100.100.2.64:3100
 ```
 
@@ -136,7 +136,7 @@ Estado confirmado:
 
 ## Alloy
 
-Alloy quedó instalado en Magnus como agente único previsto para logs. En esta etapa permanece detenido mientras se valida y crea su configuración.
+Alloy quedó instalado y habilitado en Magnus como agente único para logs. Su configuración se valida antes de reiniciar el servicio y conserva una copia de seguridad del archivo anterior.
 
 El agente debe enviar únicamente:
 
@@ -153,7 +153,7 @@ No debe enviar:
 - tokens;
 - información innecesaria del sistema.
 
-La configuración final de Alloy se documentará aquí después de validar la instalación y hacer una prueba de envío.
+La configuración se puede instalar de forma reproducible con [`scripts/install-alloy-magnus.sh`](../scripts/install-alloy-magnus.sh). El script instala Alloy desde el repositorio oficial de Grafana, agrega el usuario `alloy` al grupo `systemd-journal`, valida la conectividad a Loki, crea la configuración y habilita el servicio. Se pueden personalizar `LOKI_URL`, `NODE_LABEL` y `MAX_AGE` mediante variables de entorno.
 
 ## Troncales a monitorear
 
@@ -218,8 +218,9 @@ La reversión de Alloy no elimina HOMER, Loki, Heplify ni la configuración de A
 ## Pendientes
 
 - [x] Instalar Alloy en Magnus.
-- [ ] Crear configuración de envío a Loki.
-- [ ] Validar etiquetas en Grafana.
+- [x] Crear configuración de envío a Loki.
+- [x] Validar etiquetas y consultas iniciales en Loki.
+- [ ] Validar visualización de etiquetas en Grafana.
 - [ ] Crear monitor de los diez troncales.
 - [ ] Registrar cambios `OK` / `UNREACHABLE`.
 - [ ] Configurar alertas de Telegram.

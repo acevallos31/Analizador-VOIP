@@ -225,3 +225,26 @@ La reversión de Alloy no elimina HOMER, Loki, Heplify ni la configuración de A
 - [ ] Registrar cambios `OK` / `UNREACHABLE`.
 - [ ] Configurar alertas de Telegram.
 - [ ] Crear dashboard operativo de disponibilidad.
+
+## Monitor replicable de troncales
+
+La primera fase del monitor quedó preparada para reutilizarse en otros servidores Magnus:
+
+- [check-magnus-trunks.sh](../scripts/check-magnus-trunks.sh): consulta los peers SIP y registra cambios de estado.
+- [install-trunk-monitor.sh](../scripts/install-trunk-monitor.sh): instala el agente y el temporizador systemd.
+- [trunk-monitor.example.env](../config/trunk-monitor.example.env): parámetros y troncales seleccionables.
+- [trunk-monitor.service](../systemd/trunk-monitor.service): ejecución del chequeo.
+- [trunk-monitor.timer](../systemd/trunk-monitor.timer): ejecución cada cinco minutos.
+- [alloy-trunk-monitor.alloy](../config/alloy-trunk-monitor.alloy): fuente Alloy para enviar los eventos a Loki.
+
+Instalación en un nuevo Magnus:
+
+```bash
+git clone https://github.com/acevallos31/Analizador-VOIP.git
+cd Analizador-VOIP
+sudo bash scripts/install-trunk-monitor.sh
+sudo nano /etc/trunk-monitor/config.env
+sudo systemctl start trunk-monitor.service
+```
+
+El archivo `config.env` permite seleccionar los troncales sin modificar el script. La ejecución permanece local al Magnus; solo los eventos operativos se envían posteriormente a Loki. Los paquetes SIP continúan siendo responsabilidad de Heplify/HOMER.

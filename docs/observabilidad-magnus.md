@@ -248,3 +248,31 @@ sudo systemctl start trunk-monitor.service
 ```
 
 El archivo `config.env` permite seleccionar los troncales sin modificar el script. La ejecución permanece local al Magnus; solo los eventos operativos se envían posteriormente a Loki. Los paquetes SIP continúan siendo responsabilidad de Heplify/HOMER.
+
+### Despliegue con Ansible/Semaphore
+
+Para replicar el monitor en varios Magnus se incluye:
+
+- [install-magnus-monitor.yml](../ansible/install-magnus-monitor.yml)
+
+El inventario de Semaphore debe definir un grupo `magnus`. Las variables principales son:
+
+- `magnus_node_label`
+- `loki_url`
+- `monitor_trunks`
+
+La fuente de verdad del agente continúa siendo `/etc/trunk-monitor/config.env`. Ansible instala el script, la unidad systemd, el temporizador y la fuente de Alloy. La interfaz web futura modificará estos mismos parámetros; no tendrá una lógica diferente.
+
+### Decisión sobre la interfaz web
+
+La solución queda funcional inicialmente mediante configuración declarativa y Ansible/Semaphore. Esto permite validar el monitoreo sin exponer un endpoint web con permisos para ejecutar Asterisk.
+
+La interfaz web se puede agregar después como una capa administrativa para:
+
+- descubrir troncales;
+- seleccionar troncales;
+- modificar el intervalo;
+- cambiar el destino Loki;
+- ejecutar una prueba.
+
+La interfaz no reemplazará al agente ni ejecutará comandos directamente; generará la configuración que consume el agente.

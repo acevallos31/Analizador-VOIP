@@ -1,0 +1,104 @@
+---
+- name: Instalar monitor de troncales en Magnus
+  hosts: magnus
+  become: true
+  vars:
+    magnus_node_label: "{{ inventory_hostname }}"
+    loki_url: "http://100.100.2.64:3100"
+    monitor_trunks:
+      - "50422427780"
+      - "50422427781"
+      - "50422427782"
+      - "50422427783"
+      - "50422427784"
+      - "50422427785"
+      - "50422427786"
+      - "50422427787"
+      - "50422427788"
+      - "50422427789"
+
+  tasks:
+    - name: Crear directorios del monitor
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: /etc/trunk-monitor, mode: "0750" }
+        - { path: /var/lib/trunk-monitor, mode: "0750" }
+
+    - name: Instalar script de chequeo
+      ansible.builtin.copy:
+        src: ../scripts/check-magnus-trunks.sh
+        dest: /usr/local/sbin/check-magnus-trunks.sh
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Crear configuración del monitor
+      ansible.builtin.copy:
+        dest: /etc/trunk-monitor/config.env
+        owner: root
+        group: root
+        mode: "0640"
+        content: |
+          TRUNKS="{{ monitor_trunks | join(' ') }}"
+          ASTERISK_BIN="/usr/sbin/asterisk"
+          ASTERISK_TIMEOUT_SECONDS=15
+
+    - name: Instalar unidad del monitor
+      ansible.builtin.copy:
+        src: ../systemd/trunk-monitor.service
+        dest: /etc/systemd/system/trunk-monitor.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Instalar temporizador del monitor
+      ansible.builtin.copy:
+        src: ../systemd/trunk-monitor.timer
+        dest: /etc/systemd/system/trunk-monitor.timer
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Agregar fuente del monitor a Alloy
+      ansible.builtin.blockinfile:
+        path: /etc/alloy/config.alloy
+        marker: "// {mark} ANSIBLE TRUNK MONITOR"
+        insertafter: EOF
+        block: |
+          loki.source.journal "trunk_monitor" {
+            matches = "_SYSTEMD_UNIT=trunk-monitor.service"
+
+            labels = {
+              node     = "{{ magnus_node_label }}",
+              servicio = "trunk-monitor",
+            }
+
+            forward_to = [loki.write.magnus.receiver]
+          }
+      notify: Reiniciar Alloy
+
+    - name: Validar y activar unidades
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: trunk-monitor.timer
+        enabled: true
+        state: started
+
+    - name: Ejecutar primera comprobación
+      ansible.builtin.systemd:
+        name: trunk-monitor.service
+        state: started
+
+  handlers:
+    - name: Reiniciar Alloy
+      ansible.builtin.shell: |
+        alloy fmt --write /etc/alloy/config.alloy
+        alloy validate /etc/alloy/config.alloy
+        systemctl restart alloy
+      args:
+        executable: /bin/bash

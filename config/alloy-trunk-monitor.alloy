@@ -1,0 +1,13 @@
+// Agregar este componente a /etc/alloy/config.alloy.
+// Requiere que loki.write "magnus" ya exista.
+
+loki.source.journal "trunk_monitor" {
+  matches = "_SYSTEMD_UNIT=trunk-monitor.service"
+
+  labels = {
+    node     = "magnus-erick",
+    servicio = "trunk-monitor",
+  }
+
+  forward_to = [loki.write.magnus.receiver]
+}

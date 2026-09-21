@@ -98,7 +98,9 @@ if command -v curl >/dev/null 2>&1; then
 fi
 
 systemctl daemon-reload
-systemctl enable --now alloy
+systemctl enable alloy
+# Reinicio para que el proceso reciba el grupo systemd-journal recién agregado.
+systemctl restart alloy
 systemctl --no-pager --full status alloy
 
 echo

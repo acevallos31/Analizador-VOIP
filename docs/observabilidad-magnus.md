@@ -6,7 +6,7 @@ El despliegue base de HOMER 7 se conserva en el repositorio:
 
 - [acevallos31/homer7-docker](https://github.com/acevallos31/homer7-docker)
 
-Ese repositorio contiene recetas Docker/Compose de HOMER. Este documento describe la operación actual sobre el stack desplegado en Docker02 y la integración con Magnus/Asterisk. No se deben confundir las recetas originales con la configuración operativa actual.
+Ese repositorio contiene las recetas Docker/Compose base de HOMER. En la implementación actual, el stack de HOMER en Docker02 también incluye servicios complementarios de observabilidad, como Loki, Grafana, Prometheus y Alertmanager. Este documento describe la operación actual y su integración con Magnus/Asterisk.
 
 ## Objetivo
 
@@ -30,11 +30,13 @@ Magnus/Asterisk (srv-pbx-cystech)
             └─ HTTP hacia Loki en 100.100.2.64:3100
 ```
 
-HOMER y Loki cumplen funciones diferentes:
+Loki sí forma parte del stack desplegado junto con HOMER, pero cumple una función complementaria:
 
 - HOMER recibe paquetes HEP y permite analizar llamadas SIP.
 - Loki almacena registros de texto y eventos operativos.
+- Grafana consulta Loki para visualizar esos registros.
 - El agente de logs no debe enviar tráfico SIP crudo a Loki.
+- Loki no participa en el establecimiento ni enrutamiento de llamadas.
 
 ## Servidores y direcciones
 
@@ -115,7 +117,7 @@ En los logs se validó:
 
 ### Loki
 
-Loki corre en Docker02, publicado en el puerto TCP 3100.
+Loki es parte del stack de observabilidad desplegado junto con HOMER en Docker02. Está publicado en el puerto TCP 3100, pero no es el motor de captura SIP ni reemplaza a HOMER.
 
 Validaciones realizadas:
 

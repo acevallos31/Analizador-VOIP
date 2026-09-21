@@ -219,7 +219,7 @@ La reversión de Alloy no elimina HOMER, Loki, Heplify ni la configuración de A
 
 - [x] Instalar Alloy en Magnus.
 - [x] Crear configuración de envío a Loki.
-- [x] Validar etiquetas y consultas iniciales en Loki.
+- [ ] Confirmar streams y consultas en Loki después de generar nuevos eventos.
 - [ ] Validar visualización de etiquetas en Grafana.
 - [ ] Crear monitor de los diez troncales.
 - [ ] Registrar cambios `OK` / `UNREACHABLE`.

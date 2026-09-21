@@ -136,7 +136,7 @@ Estado confirmado:
 
 ## Alloy
 
-Al inicio de esta documentación no había Alloy ni Promtail instalado en Magnus. La instalación prevista es Alloy como agente único de logs.
+Alloy quedó instalado en Magnus como agente único previsto para logs. En esta etapa permanece detenido mientras se valida y crea su configuración.
 
 El agente debe enviar únicamente:
 
@@ -217,7 +217,7 @@ La reversión de Alloy no elimina HOMER, Loki, Heplify ni la configuración de A
 
 ## Pendientes
 
-- [ ] Confirmar instalación de Alloy en Magnus.
+- [x] Instalar Alloy en Magnus.
 - [ ] Crear configuración de envío a Loki.
 - [ ] Validar etiquetas en Grafana.
 - [ ] Crear monitor de los diez troncales.
